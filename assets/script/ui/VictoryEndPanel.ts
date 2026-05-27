@@ -466,7 +466,7 @@ function prepareEndPanel(endRoot: cc.Node, nodes?: EndNodes): void {
     // 兼容旧 quick_compile 缓存：曾写成 prepareEndPanel(nodes)
     let panel = nodes;
     let root = endRoot;
-    if (!panel && endRoot && (endRoot as EndNodes).icon) {
+    if (!panel && endRoot && (endRoot as any).icon) {
         panel = endRoot as unknown as EndNodes;
         root = panel.icon.parent;
     }

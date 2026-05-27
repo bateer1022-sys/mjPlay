@@ -13,7 +13,7 @@ export function preloadMatchEliminationSpine(onDone?: () => void): void {
     }
     cc.resources.load(MATCH_ELIMINATION_SPINE.path, sp.SkeletonData, (err, data) => {
         if (!err && data) {
-            cachedData = data;
+            cachedData = data as any;
         } else {
             cc.warn('[MatchEliminationSpine] load failed:', MATCH_ELIMINATION_SPINE.path, err);
         }
