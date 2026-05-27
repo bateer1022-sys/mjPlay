@@ -31,11 +31,11 @@ export class GamePreloader {
                 return;
             }
 
-            const level = asset.json as LevelConfig;
+            const level = (asset as any).json as LevelConfig;
             const iconKeys = level && level.keyPool ? level.keyPool : [];
             let done = 0;
             const total = 4;
-            const result: Partial<PreloadResult> = { levelAsset: asset };
+            const result: Partial<PreloadResult> = { levelAsset: asset as any };
 
             const tick = (): void => {
                 done++;
@@ -51,7 +51,7 @@ export class GamePreloader {
 
             cc.resources.load(CHECK_SOUND_PATH, cc.AudioClip, (e1, clip) => {
                 if (!e1 && clip) {
-                    result.checkClip = clip;
+                    result.checkClip = clip as any;
                 }
                 tick();
             });

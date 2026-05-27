@@ -730,8 +730,8 @@ export default class GameController extends cc.Component {
         }
         cc.resources.load(CHECK_SOUND_PATH, cc.AudioClip, (err, clip) => {
             if (!err && clip) {
-                this.checkClip = clip;
-                cc.audioEngine.playEffect(clip, false);
+                this.checkClip = clip as any;
+                cc.audioEngine.playEffect(clip as any, false);
             }
         });
     }

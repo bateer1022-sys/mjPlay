@@ -19,7 +19,7 @@ export function preloadGameImgAtlas(onDone?: (atlas: cc.SpriteAtlas | null) => v
     }
     cc.resources.load(IMG_AUTO_ATLAS_PAC, cc.SpriteAtlas, (err, atlas) => {
         if (!err && atlas) {
-            cachedAtlas = atlas;
+            cachedAtlas = atlas as any;
         }
         const pending = atlasLoadPending.slice();
         atlasLoadPending.length = 0;
@@ -55,7 +55,7 @@ export function loadGameSpriteFrame(
 
     const finishDirect = (): void => {
         cc.resources.load(resPath, cc.SpriteFrame, (err, sf) => {
-            onReady(!err && sf ? sf : null);
+            onReady(!err && sf ? sf as any : null);
         });
     };
 
