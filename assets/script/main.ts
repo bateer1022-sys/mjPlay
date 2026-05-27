@@ -74,6 +74,7 @@ const SCORE_COMBO_ADD = 40;
 const SCORE_RATE_BONUS = [100, 200, 350, 500, 800];
 const SCORE_TOP_MARGIN = 64;
 
+
 @ccclass('GameController')
 export default class GameController extends cc.Component {
 
