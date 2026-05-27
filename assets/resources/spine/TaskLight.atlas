@@ -1,0 +1,13 @@
+TaskLight.png
+size: 187, 187
+format: RGBA8888
+filter: Linear, Linear
+repeat: none
+CFXM2_T_GlowSoft2
+  rotate: false
+  xy: 2, 2
+  size: 183, 183
+  orig: 202, 204
+  offset: 13, 10
+  index: -1
+

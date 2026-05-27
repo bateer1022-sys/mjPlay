@@ -1,0 +1,9 @@
+{
+  "name": "mjplay",
+  "private": true,
+  "scripts": {
+    "build": "bash tools/build-web.sh",
+    "build:web": "bash tools/build-web.sh",
+    "package:super-html": "bash tools/package-super-html.sh"
+  }
+}
