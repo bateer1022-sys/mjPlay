@@ -17,7 +17,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
-BASE_NAME="PA_MJ1218_btr"
+BASE_NAME="PA_MJ1220_btr"
 SRC_DIR="${PROJECT_DIR}/build/super-html"
 OUT_DIR="${SRC_DIR}/zip-out"
 SKIP_DIRS="zip-out"
