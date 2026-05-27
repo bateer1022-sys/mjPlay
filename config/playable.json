@@ -1,0 +1,10 @@
+{
+  "baseName": "PA_MJ1220_btr",
+  "superHtml": {
+    "srcDir": "build/super-html",
+    "outDir": "build/super-html/zip-out",
+    "skipDirs": [
+      "zip-out"
+    ]
+  }
+}

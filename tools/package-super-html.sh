@@ -1,16 +1,19 @@
 #!/usr/bin/env bash
 # 在 build/super-html 各渠道子目录内重命名（同目录 mv，不删除、不打包）
-# - 多个 .zip：只把文件名最短的那个 -> PA_MJ1218_btr_<渠道名>.zip，其余不动
-# - 单个 .zip：-> PA_MJ1218_btr_<渠道名>.zip
-# - 多个 .html：只改文件名最短的那个 -> PA_MJ1218_btr_<渠道名>.html
-# - 单个 .html：-> PA_MJ1218_btr_<渠道名>.html
+# - 多个 .zip：只把文件名最短的那个 -> <baseName>_<渠道名>.zip，其余不动
+# - 单个 .zip：-> <baseName>_<渠道名>.zip
+# - 多个 .html：只改文件名最短的那个 -> <baseName>_<渠道名>.html
+# - 单个 .html：-> <baseName>_<渠道名>.html
 #   （<渠道名> 为 build/super-html 下该文件所在子目录名）
 # - 重命名成功的文件会复制一份到 build/super-html/zip-out/
 #
 # 用法:
 #   ./tools/package-super-html.sh
-#   ./tools/package-super-html.sh --base PA_MJ1218_btr
+#   ./tools/package-super-html.sh --base PA_MJ1220_btr
 #   ./tools/package-super-html.sh --out build/super-html/zip-out
+#   ./tools/package-super-html.sh --config config/playable.json
+# 默认配置:
+#   会优先读取 config/playable.json 的 baseName（若存在）
 
 set -euo pipefail
 
@@ -21,11 +24,46 @@ BASE_NAME="PA_MJ1220_btr"
 SRC_DIR="${PROJECT_DIR}/build/super-html"
 OUT_DIR="${SRC_DIR}/zip-out"
 SKIP_DIRS="zip-out"
+CONFIG_PATH="${PROJECT_DIR}/config/playable.json"
+
+load_base_name_from_config() {
+  local config="$1"
+  local value=""
+  [[ ! -f "$config" ]] && return 0
+  if ! command -v node >/dev/null 2>&1; then
+    echo "[package-super-html] 提示：未找到 node，跳过读取配置文件: ${config}" >&2
+    return 0
+  fi
+  value="$(node -e '
+const fs = require("fs");
+const file = process.argv[1];
+try {
+  const parsed = JSON.parse(fs.readFileSync(file, "utf8"));
+  const baseName = parsed && parsed.baseName;
+  if (typeof baseName === "string" && baseName.trim()) {
+    process.stdout.write(baseName.trim());
+  }
+} catch (_) {}
+' "$config" 2>/dev/null || true)"
+  if [[ -n "$value" ]]; then
+    BASE_NAME="$value"
+  fi
+}
+
+load_base_name_from_config "$CONFIG_PATH"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --base)
       BASE_NAME="${2:?missing value for --base}"
+      shift 2
+      ;;
+    --config)
+      CONFIG_PATH="${2:?missing value for --config}"
+      if [[ "$CONFIG_PATH" != /* ]]; then
+        CONFIG_PATH="${PROJECT_DIR}/${CONFIG_PATH}"
+      fi
+      load_base_name_from_config "$CONFIG_PATH"
       shift 2
       ;;
     --src)
@@ -40,7 +78,7 @@ while [[ $# -gt 0 ]]; do
       shift 2
       ;;
     -h|--help)
-      sed -n '2,8p' "$0" | sed 's/^# \{0,1\}//'
+      sed -n '2,16p' "$0" | sed 's/^# \{0,1\}//'
       exit 0
       ;;
     *)
