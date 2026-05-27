@@ -1,13 +1,16 @@
 #!/usr/bin/env bash
 # 在 build/super-html 各渠道子目录内重命名（同目录 mv，不删除、不打包）
-# - 多个 .zip：只把文件名最短的那个 -> PA_MJ1218_btr.zip，其余不动
-# - 单个 .zip：-> PA_MJ1218_btr.zip
-# - 多个 .html：只改文件名最短的那个 -> PA_MJ1218_btr.html
-# - 单个 .html：-> PA_MJ1218_btr.html
+# - 多个 .zip：只把文件名最短的那个 -> PA_MJ1218_btr_<渠道名>.zip，其余不动
+# - 单个 .zip：-> PA_MJ1218_btr_<渠道名>.zip
+# - 多个 .html：只改文件名最短的那个 -> PA_MJ1218_btr_<渠道名>.html
+# - 单个 .html：-> PA_MJ1218_btr_<渠道名>.html
+#   （<渠道名> 为 build/super-html 下该文件所在子目录名）
+# - 重命名成功的文件会复制一份到 build/super-html/zip-out/
 #
 # 用法:
 #   ./tools/package-super-html.sh
 #   ./tools/package-super-html.sh --base PA_MJ1218_btr
+#   ./tools/package-super-html.sh --out build/super-html/zip-out
 
 set -euo pipefail
 
@@ -16,6 +19,7 @@ PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 BASE_NAME="PA_MJ1218_btr"
 SRC_DIR="${PROJECT_DIR}/build/super-html"
+OUT_DIR="${SRC_DIR}/zip-out"
 SKIP_DIRS="zip-out"
 
 while [[ $# -gt 0 ]]; do
@@ -26,6 +30,13 @@ while [[ $# -gt 0 ]]; do
       ;;
     --src)
       SRC_DIR="${PROJECT_DIR}/${2:?missing value for --src}"
+      shift 2
+      ;;
+    --out)
+      OUT_DIR="${2:?missing value for --out}"
+      if [[ "$OUT_DIR" != /* ]]; then
+        OUT_DIR="${PROJECT_DIR}/${OUT_DIR}"
+      fi
       shift 2
       ;;
     -h|--help)
@@ -60,6 +71,15 @@ rename_file() {
     return 0
   fi
   mv "$src" "$dest"
+}
+
+copy_to_out() {
+  local src="$1"
+  local name
+  name="$(basename "$src")"
+  mkdir -p "$OUT_DIR"
+  cp "$src" "${OUT_DIR}/${name}"
+  echo "[package-super-html] 复制: ${name} -> ${OUT_DIR}/"
 }
 
 # 从路径列表里选出「完整路径字符串最短」的一项（同目录下即文件名最短）
@@ -101,6 +121,9 @@ rename_shortest_or_only() {
 
   local dest="${dir}/${dest_name}"
   rename_file "$src_path" "$dest"
+  if [[ -f "$dest" && ( "$src_path" == "$dest" || ! -e "$src_path" ) ]]; then
+    copy_to_out "$dest"
+  fi
   if [[ "$count" -gt 1 ]]; then
     echo "[package-super-html] ${channel}: $(basename "$src_path") -> ${dest_name}（${count} 个文件中只改最短名，其余未动）"
   else
@@ -115,10 +138,12 @@ rename_dir() {
   channel="$(basename "$dir")"
   local did=0
 
-  if rename_shortest_or_only "$dir" "$channel" 'NewProject_*.zip' "${BASE_NAME}.zip"; then
+  local out_name="${BASE_NAME}_${channel}"
+
+  if rename_shortest_or_only "$dir" "$channel" 'NewProject_*.zip' "${out_name}.zip"; then
     did=1
   fi
-  if rename_shortest_or_only "$dir" "$channel" 'NewProject_*.html' "${BASE_NAME}.html"; then
+  if rename_shortest_or_only "$dir" "$channel" 'NewProject_*.html' "${out_name}.html"; then
     did=1
   fi
 
@@ -143,4 +168,4 @@ if [[ "$total" -eq 0 ]]; then
   exit 1
 fi
 
-echo "[package-super-html] 完成，共处理 ${total} 个渠道目录"
+echo "[package-super-html] 完成，共处理 ${total} 个渠道目录，输出目录: ${OUT_DIR}"
