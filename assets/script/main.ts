@@ -118,11 +118,11 @@ export default class GameController extends cc.Component {
             if (this.loadingScreen) {
                 this.loadingScreen.layout();
             }
-        }, this);
+        });
     }
 
     onDestroy() {
-        cc.view.setResizeCallback(null, null);
+        cc.view.setResizeCallback(null);
         this.unschedule(this.onIdleGuide);
     }
 

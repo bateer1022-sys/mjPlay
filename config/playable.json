@@ -4,7 +4,11 @@
     "srcDir": "build/super-html",
     "outDir": "build/super-html/zip-out",
     "skipDirs": [
-      "zip-out"
+      "zip-out",
+      "common",
+      "gdt",
+      "inmobi",
+      "ironsource2025"
     ]
   }
 }
